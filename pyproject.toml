@@ -1,0 +1,18 @@
+[project]
+name = "ytp"
+version = "0.1.0"
+description = "A beautiful terminal YouTube playlist downloader"
+readme = "README.md"
+requires-python = ">=3.10"
+
+dependencies = [
+    "rich",
+    "yt-dlp"
+]
+
+[project.scripts]
+ytp = "ytp.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
