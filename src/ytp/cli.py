@@ -7,9 +7,7 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.prompt import Prompt, IntPrompt
 
-
 console = Console()
-
 
 DEFAULT_DIR = Path.home() / "Videos" / "ytp-downloads"
 DOWNLOADS = Path.home() / "Downloads"
@@ -19,24 +17,16 @@ def choose_folder():
 
     console.print("\n[bold cyan]Download location[/bold cyan]")
 
-    console.print(
-        "1. Default"
-    )
+    console.print("1. Default")
+    console.print(f"   {DEFAULT_DIR}")
 
-    console.print(
-        f"   {DEFAULT_DIR}"
-    )
-
-    console.print(
-        "2. Custom folder"
-    )
+    console.print("2. Custom folder")
 
     choice = IntPrompt.ask(
         "Choose",
         choices=["1", "2"],
         default=1
     )
-
 
     if choice == 1:
         return DEFAULT_DIR
@@ -58,7 +48,7 @@ def choose_folder():
 
 
 
-def download_playlist(url, output):
+def download_playlist(url, output, start):
 
     output.mkdir(
         parents=True,
@@ -72,27 +62,31 @@ def download_playlist(url, output):
 
         # Best video + best audio
         "-f",
-        "bv*+ba/b",
+        "bestvideo+bestaudio/best",
 
+        # Always output mp4
         "--merge-output-format",
         "mp4",
 
+        # Start position in playlist
+        "--playlist-start",
+        str(start),
+
+        # Resume unfinished downloads
         "--continue",
 
+        # Continue even if one video fails
         "--ignore-errors",
 
-        "--embed-thumbnail",
+        # Don't download extra files
+        "--no-write-info-json",
+        "--no-write-thumbnail",
 
-        "--embed-metadata",
-
-        "--write-description",
-
-        "--write-info-json",
-
+        # Don't overwrite existing videos
         "--no-overwrites",
 
+        # Organize playlist
         "-o",
-
         str(
             output /
             "%(playlist_title)s/%(playlist_index)03d - %(title)s.%(ext)s"
@@ -115,7 +109,10 @@ def main():
 
     console.print(
         Panel.fit(
-            "[bold cyan] >>>>>>>>>>>>>>>>>>>> 🎬 YTP - YouTube Playlist Downloader[/bold cyan] <<<<<<<<<<<<<<<<<<<< "
+            "[bold cyan]"
+            ">>>>>>>>>>>>>>>>>>>> 🎬 YTP - YouTube Playlist Downloader "
+            "<<<<<<<<<<<<<<<<<<<<"
+            "[/bold cyan]"
         )
     )
 
@@ -128,14 +125,25 @@ def main():
     folder = choose_folder()
 
 
+    start = IntPrompt.ask(
+        "\nStart downloading from video number",
+        default=1
+    )
+
+
     console.print(
-        f"\n[green]Saving to:[/green] {folder}\n"
+        f"\n[green]Saving to:[/green] {folder}"
+    )
+
+    console.print(
+        f"[green]Starting from video:[/green] {start}\n"
     )
 
 
     download_playlist(
         url,
-        folder
+        folder,
+        start
     )
 
 
